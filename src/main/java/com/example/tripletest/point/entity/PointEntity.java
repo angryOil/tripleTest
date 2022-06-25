@@ -17,6 +17,7 @@ public class PointEntity {
     @Id
     private UUID uuid;
 
+    private String userId;
     private int mileage;
 
 }

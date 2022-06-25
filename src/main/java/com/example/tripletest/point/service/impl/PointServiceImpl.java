@@ -16,14 +16,6 @@ public class PointServiceImpl implements PointService {
 
     private final PointRepository pointRepository;
     private final UserRepository userRepository;
-    @Override
-    public PointEntity create(UserEntity userEntity) {
-        PointEntity pointEntity = PointEntity.builder()
-                .uuid(userEntity.getUuid())
-                .mileage(0)
-                .build();
-        return pointRepository.save(pointEntity);
-    }
 
     @Override
     public PointEntity searchByUuid(UUID uuid) {

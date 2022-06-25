@@ -17,6 +17,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PointRepository pointRepository;
+
     @Override
     @Transactional
     public boolean register(UserDto userDto) {
@@ -30,6 +31,8 @@ public class UserServiceImpl implements UserService {
                         .build());
         pointRepository.save(PointEntity.builder()
                 .uuid(userEntity.getUuid())
+                .userId(userEntity.getId())
+                .mileage(0)
                 .build());
         return true;
     }
