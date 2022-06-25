@@ -9,4 +9,5 @@ public interface UserService {
      boolean register(UserDto userDto);
      List<UserEntity> findUsers();
      UserDto login(UserDto userDto);
+     UserEntity searchByUserId(String userId);
 }

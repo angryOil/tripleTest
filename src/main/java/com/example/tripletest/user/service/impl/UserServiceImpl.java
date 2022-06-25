@@ -1,7 +1,7 @@
 package com.example.tripletest.user.service.impl;
 
+import com.example.tripletest.point.entity.PointEntity;
 import com.example.tripletest.point.repository.PointRepository;
-import com.example.tripletest.point.service.PointService;
 import com.example.tripletest.user.dto.UserDto;
 import com.example.tripletest.user.entity.UserEntity;
 import com.example.tripletest.user.repository.UserRepository;
@@ -16,8 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final PointService pointService;
-
+    private final PointRepository pointRepository;
     @Override
     @Transactional
     public boolean register(UserDto userDto) {
@@ -29,7 +28,9 @@ public class UserServiceImpl implements UserService {
                         .id(userDto.getId())
                         .pw(userDto.getPw())
                         .build());
-        pointService.create(userEntity);
+        pointRepository.save(PointEntity.builder()
+                .uuid(userEntity.getUuid())
+                .build());
         return true;
     }
 
@@ -43,5 +44,11 @@ public class UserServiceImpl implements UserService {
         UserEntity findUser = userRepository.findById(userDto.getId());
         return findUser.getPw().equals(userDto.getPw()) ? userDto : null;
     }
+
+    @Override
+    public UserEntity searchByUserId(String userId) {
+        return userRepository.findById(userId);
+    }
+
 
 }

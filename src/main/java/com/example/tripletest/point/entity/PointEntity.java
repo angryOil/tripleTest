@@ -1,9 +1,10 @@
 package com.example.tripletest.point.entity;
 
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.UUID;
 
 @Entity
@@ -14,9 +15,8 @@ import java.util.UUID;
 @Builder
 public class PointEntity {
     @Id
-    @GeneratedValue(generator =  "uuid")
-    @GenericGenerator(name = "name=uuid",strategy = "uuid")
     private UUID uuid;
+
     private int mileage;
 
 }

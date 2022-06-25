@@ -1,5 +1,6 @@
 package com.example.tripletest.user.entity;
 
+
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -13,8 +14,7 @@ import java.util.UUID;
 @Table(name = "user")
 public class UserEntity {
     @Id
-    @GeneratedValue(generator =  "uuid")
-    @GenericGenerator(name = "name=uuid",strategy = "uuid")
+    @GeneratedValue
     private UUID uuid;
 
     @Column(unique = true)
