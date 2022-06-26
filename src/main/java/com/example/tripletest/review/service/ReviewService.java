@@ -10,6 +10,8 @@ import java.util.List;
 public interface ReviewService {
 
     List<ReviewEntity> getReviews();
+
+    ReviewEntity ModifyReview(ReviewDto reviewDto);
     ReviewEntity addReview(ReviewDto reviewDto);
 
 }

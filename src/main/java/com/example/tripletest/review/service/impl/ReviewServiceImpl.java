@@ -1,5 +1,8 @@
 package com.example.tripletest.review.service.impl;
 
+import com.example.tripletest.photo.dto.PhotoDto;
+import com.example.tripletest.photo.entity.PhotoEntity;
+import com.example.tripletest.photo.repository.PhotoRepository;
 import com.example.tripletest.place.repository.PlaceRepository;
 import com.example.tripletest.point.entity.PointEntity;
 import com.example.tripletest.point.entity.PointLogEntity;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RequiredArgsConstructor
@@ -26,11 +30,13 @@ public class ReviewServiceImpl implements ReviewService {
     private final PlaceRepository placeRepository;
     private final PointRepository pointRepository;
     private final PointLogRepository pointLogRepository;
+    private final PhotoRepository photoRepository;
 
     @Override
     public List<ReviewEntity> getReviews() {
         return reviewRepository.findAll();
     }
+
 
     @Override
     @Transactional
@@ -41,7 +47,7 @@ public class ReviewServiceImpl implements ReviewService {
         } else {
             ReviewEntity findReview = reviewRepository
                     .findByUserIdAndPlaceId(reviewDto.getUserId(), reviewDto.getPlaceId());
-            // 리뷰가 존재할경우 null 리턴
+            // 리뷰가 존재하고 삭제하지 않은 경우
             if (findReview != null && (!findReview.isDeleteFlag())) return null;
             //포인트 저장
             PointEntity pointEntity = pointRepository.findByUuid(reviewDto.getUserId());
@@ -60,17 +66,40 @@ public class ReviewServiceImpl implements ReviewService {
                     .build()
             );
 
+            //포토있을경우 포토 저장
+            if (reviewDto.getPhotoNames().size() != 0) {
+                reviewDto
+                        .getPhotoNames()
+                        .forEach(name -> {
+                            photoRepository.save(
+                                    PhotoEntity.builder()
+                                            .reviewEntity(reviewEntity)
+                                            .name(name)
+                                            .build());
+                        });
+            }
             //포인트 로그
             pointLogRepository.save(PointLogEntity.builder()
-                            .pointId(pointEntity.getUuid())
-                            .reviewId(reviewEntity.getUuid())
-                            .placeId(reviewDto.getPlaceId())
-                            .action("ADD")
-                            .pointApply(plusMile)
+                    .pointId(pointEntity.getUuid())
+                    .reviewId(reviewEntity.getUuid())
+                    .placeId(reviewDto.getPlaceId())
+                    .action("ADD")
+                    .pointApply(plusMile)
                     .build());
 
-            //작성된리뷰의 엔티티를 저장하면서 리턴
+            //작성된리뷰의 엔티티를  리턴
             return reviewEntity;
         }
     }
+
+
+    @Override
+    @Transactional
+    public ReviewEntity ModifyReview(ReviewDto reviewDto) {
+        //이전 리뷰와 비교 후 점수 증감
+        ReviewEntity originReview = reviewRepository.findByUserIdAndPlaceId(reviewDto.getUserId(), reviewDto.getPlaceId());
+//        boolean originReviewPhoto =
+        return null;
+    }
+
 }

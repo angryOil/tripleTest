@@ -16,7 +16,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/user/new")
-    public boolean register(@RequestBody UserDto userDto) {
+    public UserEntity register(@RequestBody UserDto userDto) {
         return userService.register(userDto);
     }
 
