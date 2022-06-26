@@ -70,11 +70,11 @@ public class ReviewServiceImpl implements ReviewService {
             if (reviewDto.getPhotoNames().size() != 0) {
                 reviewDto
                         .getPhotoNames()
-                        .forEach(name -> {
+                        .forEach(photoDto -> {
                             photoRepository.save(
                                     PhotoEntity.builder()
                                             .reviewEntity(reviewEntity)
-                                            .name(name)
+                                            .name(photoDto.getPhotoName())
                                             .build());
                         });
             }
@@ -100,7 +100,24 @@ public class ReviewServiceImpl implements ReviewService {
         ReviewEntity originReview = reviewRepository.findByUserIdAndPlaceId(reviewDto.getUserId(), reviewDto.getPlaceId());
         List<PhotoEntity> originPhotos = photoRepository.findAllByReviewEntity(originReview);
 
+        PointEntity pointEntity = pointRepository.findByUuid(originReview.getUserId());
 
+        int changeMile;
+        if (originPhotos.size() == 0) { //전리뷰에 사진이없었을경우 업데이트리뷰에 사진있으면 1점 없으면 0점추가
+            changeMile = reviewDto.getPhotoNames().size() == 0 ? 0 : 1;
+        } else { //전리뷰는 사진이있었지만 업로드 리뷰에 사진이없다면 -1 있다면 0점
+            changeMile = reviewDto.getPhotoNames().size() == 0 ? -1 : 0;
+        }
+        // 포인트 변경이 있을경우 포인트 변경
+        if (changeMile != 0) {
+            pointRepository.save(
+                    PointEntity.builder()
+                            .uuid(pointEntity.getUuid())
+                            .userId(pointEntity.getUserId())
+                            .mileage(pointEntity.getMileage() + changeMile)
+                            .build());
+        }
+        //포토 변화있으면 db 에서 변경
 
         return null;
     }

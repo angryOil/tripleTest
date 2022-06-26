@@ -10,5 +10,7 @@ import java.util.UUID;
 @Setter
 @Builder
 public class PhotoDto {
-    UUID reviewId;
+    UUID photoIO;
+    UUID userId;
+    String photoName;
 }
