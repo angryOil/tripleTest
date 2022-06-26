@@ -7,9 +7,12 @@ import com.example.tripletest.place.service.PlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class PlaceServiceImpl implements PlaceService {
+
 
     private final PlaceRepository placeRepository;
 
@@ -23,5 +26,10 @@ public class PlaceServiceImpl implements PlaceService {
                 .specialFlag(placeDto.isSpecialFlag())
                 .build()
         );
+    }
+
+    @Override
+    public List<PlaceEntity> getPlaces() {
+        return placeRepository.findAll();
     }
 }

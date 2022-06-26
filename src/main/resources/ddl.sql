@@ -31,22 +31,24 @@ create table place
 
 
 
-create table photo
-(
-    uuid      binary(16) primary key,
-    review_id binary(16) not null
-);
 
 create table review
 (
     uuid               binary(16) primary key,
     user_id            binary(16) not null,
     place_id           binary(16) not null,
-    attached_photo_ids varchar(999),
+    content            varchar(500) not null ,
     delete_flag        boolean default false,
     foreign key (user_id) references user (uuid),
     foreign key (place_id) references place (uuid)
 );
+
+create table photo
+(
+    uuid      binary(16) primary key,
+    review_id binary(16) not null
+);
+
 
 create table point_log
 (
