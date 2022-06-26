@@ -6,7 +6,7 @@ import com.example.tripletest.user.entity.UserEntity;
 import java.util.List;
 
 public interface UserService {
-     boolean register(UserDto userDto);
+     UserEntity register(UserDto userDto);
      List<UserEntity> findUsers();
      UserDto login(UserDto userDto);
      UserEntity searchByUserId(String userId);

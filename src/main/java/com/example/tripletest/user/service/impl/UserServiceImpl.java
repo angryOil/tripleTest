@@ -20,9 +20,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public boolean register(UserDto userDto) {
+    public UserEntity register(UserDto userDto) {
         if (userRepository.findById(userDto.getId()) != null) {
-            return false;
+            return null;
         }
         UserEntity userEntity = userRepository.save(
                 UserEntity.builder()
@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
                 .userId(userEntity.getId())
                 .mileage(0)
                 .build());
-        return true;
+        return userEntity;
     }
 
     @Override

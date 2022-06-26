@@ -15,7 +15,7 @@ create table user
 create table point
 (
     uuid    binary(16) primary key,
-    user_id  varchar(25) unique,
+    user_id varchar(25) unique,
     mileage int default 0,
     foreign key (uuid) references user (uuid)
 );
@@ -31,14 +31,13 @@ create table place
 
 
 
-
 create table review
 (
-    uuid               binary(16) primary key,
-    user_id            binary(16) not null,
-    place_id           binary(16) not null,
-    content            varchar(500) not null ,
-    delete_flag        boolean default false,
+    uuid        binary(16) primary key,
+    user_id     binary(16)   not null,
+    place_id    binary(16)   not null,
+    content     varchar(500) not null,
+    delete_flag boolean default false,
     foreign key (user_id) references user (uuid),
     foreign key (place_id) references place (uuid)
 );
@@ -46,18 +45,20 @@ create table review
 create table photo
 (
     uuid      binary(16) primary key,
-    review_id binary(16) not null
+    name      varchar(50),
+    review_id binary(16) not null,
+    foreign key (review_id) references review (uuid)
 );
 
 
 create table point_log
 (
-    uuid       binary(16) primary key,
-    point_id   binary(16) not null,
-    review_id  binary(16) not null,
-    place_id   binary(16) not null,
-    action     varchar(6) not null,
-    pointApply tinyint(1) not null,
+    uuid        binary(16) primary key,
+    point_id    binary(16) not null,
+    review_id   binary(16) not null,
+    place_id    binary(16) not null,
+    action      varchar(6) not null,
+    point_apply tinyint(1) not null,
     foreign key (point_id) references point (uuid),
     foreign key (review_id) references review (uuid),
     foreign key (place_id) references place (uuid)
