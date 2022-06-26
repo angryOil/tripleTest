@@ -98,7 +98,10 @@ public class ReviewServiceImpl implements ReviewService {
     public ReviewEntity ModifyReview(ReviewDto reviewDto) {
         //이전 리뷰와 비교 후 점수 증감
         ReviewEntity originReview = reviewRepository.findByUserIdAndPlaceId(reviewDto.getUserId(), reviewDto.getPlaceId());
-//        boolean originReviewPhoto =
+        List<PhotoEntity> originPhotos = photoRepository.findAllByReviewEntity(originReview);
+
+
+
         return null;
     }
 
