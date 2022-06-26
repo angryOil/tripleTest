@@ -2,6 +2,8 @@ package com.example.tripletest.review.service.impl;
 
 import com.example.tripletest.place.repository.PlaceRepository;
 import com.example.tripletest.point.entity.PointEntity;
+import com.example.tripletest.point.entity.PointLogEntity;
+import com.example.tripletest.point.repository.PointLogRepository;
 import com.example.tripletest.point.repository.PointRepository;
 import com.example.tripletest.review.dto.ReviewDto;
 import com.example.tripletest.review.entity.ReviewEntity;
@@ -23,6 +25,8 @@ public class ReviewServiceImpl implements ReviewService {
     private final UserRepository userRepository;
     private final PlaceRepository placeRepository;
     private final PointRepository pointRepository;
+    private final PointLogRepository pointLogRepository;
+
     @Override
     public List<ReviewEntity> getReviews() {
         return reviewRepository.findAll();
@@ -37,23 +41,36 @@ public class ReviewServiceImpl implements ReviewService {
         } else {
             ReviewEntity findReview = reviewRepository
                     .findByUserIdAndPlaceId(reviewDto.getUserId(), reviewDto.getPlaceId());
-            // 리뷰가 존재할경우
+            // 리뷰가 존재할경우 null 리턴
             if (findReview != null && (!findReview.isDeleteFlag())) return null;
-
-            PointEntity point = pointRepository.findByUuid(reviewDto.getUserId());
+            //포인트 저장
+            PointEntity pointEntity = pointRepository.findByUuid(reviewDto.getUserId());
+            int plusMile = (reviewDto.getPhotoNames() != null) ? 2 : 1;
             pointRepository.save(PointEntity.builder()
-                    .uuid(point.getUuid())
-                    .mileage(point.getMileage() + ((reviewDto.getPhotoNames() !=  null) ? 2 : 1))
-                    .userId(point.getUserId())
+                    .uuid(pointEntity.getUuid())
+                    .mileage(pointEntity.getMileage() + plusMile)
+                    .userId(pointEntity.getUserId())
                     .build());
-
-            return reviewRepository.save(ReviewEntity.builder()
+            //리뷰 저장
+            ReviewEntity reviewEntity = reviewRepository.save(ReviewEntity.builder()
                     .userId(reviewDto.getUserId())
                     .placeId(reviewDto.getPlaceId())
                     .content(reviewDto.getContent())
                     .deleteFlag(false)
                     .build()
             );
+
+            //포인트 로그
+            pointLogRepository.save(PointLogEntity.builder()
+                            .pointId(pointEntity.getUuid())
+                            .reviewId(reviewEntity.getUuid())
+                            .placeId(reviewDto.getPlaceId())
+                            .action("ADD")
+                            .pointApply(plusMile)
+                    .build());
+
+            //작성된리뷰의 엔티티를 저장하면서 리턴
+            return reviewEntity;
         }
     }
 }

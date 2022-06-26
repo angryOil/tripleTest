@@ -57,7 +57,7 @@ create table point_log
     review_id  binary(16) not null,
     place_id   binary(16) not null,
     action     varchar(6) not null,
-    pointApply tinyint(1) not null,
+    point_apply tinyint(1) not null,
     foreign key (point_id) references point (uuid),
     foreign key (review_id) references review (uuid),
     foreign key (place_id) references place (uuid)
