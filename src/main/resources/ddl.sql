@@ -37,7 +37,7 @@ create table review
     user_id     binary(16)   not null,
     place_id    binary(16)   not null,
     content     varchar(500) not null,
-    delete_flag boolean default false,
+    reword_score tinyint(1)  not null ,
     foreign key (user_id) references user (uuid),
     foreign key (place_id) references place (uuid)
 );
@@ -57,8 +57,9 @@ create table point_log
     point_id    binary(16) not null,
     review_id   binary(16) not null,
     place_id    binary(16) not null,
-    action      varchar(6) not null,
-    point_apply tinyint(1) not null,
+    action      varchar(10) not null,
+    review_kind varchar(20) not null ,
+    point_change tinyint(1) not null,
     foreign key (point_id) references point (uuid),
     foreign key (review_id) references review (uuid),
     foreign key (place_id) references place (uuid)

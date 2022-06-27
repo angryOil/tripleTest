@@ -17,6 +17,7 @@ public class PlaceServiceImpl implements PlaceService {
     private final PlaceRepository placeRepository;
 
 
+
     @Override
     public PlaceEntity create(PlaceDto placeDto) {
         return placeRepository.save(PlaceEntity

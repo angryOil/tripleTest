@@ -23,9 +23,7 @@ public class ReviewEntity {
 
     private UUID userId;
     private UUID placeId;
-
+    private int rewordScore;
     private String content;
-
-    private boolean deleteFlag;
 
 }

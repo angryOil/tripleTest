@@ -23,7 +23,8 @@ public class PointLogEntity {
     private UUID reviewId;
     private UUID placeId;
     private String action;
-
+    private String reviewKind;
+    private int pointChange;
     private int pointApply;
 
 }
