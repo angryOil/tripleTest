@@ -6,12 +6,15 @@ import com.example.tripletest.review.entity.ReviewEntity;
 import com.example.tripletest.user.entity.UserEntity;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ReviewService {
 
     List<ReviewEntity> getReviews();
 
-    ReviewEntity ModifyReview(ReviewDto reviewDto);
-    ReviewEntity addReview(ReviewDto reviewDto);
+    ReviewDto modifyReview(ReviewDto reviewDto) throws Exception;
+    ReviewEntity addReview(ReviewDto reviewDto) throws Exception;
 
+    ReviewDto getReview(UUID uuid);
 }
+

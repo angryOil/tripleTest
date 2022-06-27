@@ -10,7 +10,7 @@ import java.util.UUID;
 @Setter
 @Builder
 public class PhotoDto {
-    UUID photoIO;
+    UUID photoID;
     UUID userId;
     String photoName;
 }

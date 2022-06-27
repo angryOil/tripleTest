@@ -9,4 +9,5 @@ import java.util.UUID;
 
 public interface PhotoRepository extends JpaRepository<PhotoEntity , UUID> {
     List<PhotoEntity> findAllByReviewEntity(ReviewEntity reviewEntity);
+    void deleteAllByReviewEntity(ReviewEntity reviewEntity);
 }
