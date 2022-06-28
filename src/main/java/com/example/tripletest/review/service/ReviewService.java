@@ -16,5 +16,7 @@ public interface ReviewService {
     ReviewEntity addReview(ReviewDto reviewDto) throws Exception;
 
     ReviewDto getReview(UUID uuid);
+
+    void deleteReview(ReviewDto reviewDto);
 }
 

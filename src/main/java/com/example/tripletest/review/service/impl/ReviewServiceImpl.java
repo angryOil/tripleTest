@@ -191,5 +191,24 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
 
+    @Transactional(rollbackFor = SQLException.class)
+    public void deleteReview(ReviewDto reviewDto) {
+        ReviewEntity reviewEntity = reviewRepository.findById(reviewDto.getUuid()).orElseThrow(() -> new RuntimeException("no review"));
+        UserEntity userEntity = userRepository.findById(reviewEntity.getUserId()).orElseThrow(() -> new RuntimeException("no user"));
+        PointEntity pointEntity = pointRepository.findByUuid(userEntity.getUuid());
+        //점수 회수
+        pointRepository.save(PointEntity.builder()
+                .uuid(pointEntity.getUuid())
+                .userId(pointEntity.getUserId())
+                .mileage(pointEntity.getMileage() - reviewEntity.getRewordScore())
+                .build());
+        //사진 삭제
+        photoRepository.deleteAllByReviewEntity(reviewEntity);
+
+        //리뷰삭제
+        reviewRepository.deleteById(reviewEntity.getUuid());
+
+    }
+
 
 }
