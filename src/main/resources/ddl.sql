@@ -60,7 +60,4 @@ create table point_log
     action      varchar(10) not null,
     review_kind varchar(20) not null ,
     point_change tinyint(1) not null,
-    foreign key (point_id) references point (uuid),
-    foreign key (review_id) references review (uuid),
-    foreign key (place_id) references place (uuid)
 );

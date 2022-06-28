@@ -33,4 +33,10 @@ public class ReviewController {
     public ReviewDto modReview(@RequestBody ReviewDto reviewDto)throws Exception {
         return reviewService.modifyReview(reviewDto);
     }
+
+    @DeleteMapping("/review")
+    public void deleteReview(@RequestBody ReviewDto reviewDto) {
+        reviewService.deleteReview(reviewDto);
+
+    }
 }
