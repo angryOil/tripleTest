@@ -1,6 +1,7 @@
 package com.example.tripletest.review.service;
 
 import com.example.tripletest.place.entity.PlaceEntity;
+import com.example.tripletest.point.entity.PointEntity;
 import com.example.tripletest.review.dto.ReviewDto;
 import com.example.tripletest.review.entity.ReviewEntity;
 import com.example.tripletest.user.entity.UserEntity;
@@ -17,6 +18,6 @@ public interface ReviewService {
 
     ReviewDto getReview(UUID uuid);
 
-    void deleteReview(ReviewDto reviewDto);
+    PointEntity deleteReview(ReviewDto reviewDto) throws Exception;
 }
 

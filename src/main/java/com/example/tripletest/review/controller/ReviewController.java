@@ -1,9 +1,13 @@
 package com.example.tripletest.review.controller;
 
+import com.example.tripletest.point.entity.PointEntity;
 import com.example.tripletest.review.dto.ReviewDto;
 import com.example.tripletest.review.entity.ReviewEntity;
 import com.example.tripletest.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,8 +29,13 @@ public class ReviewController {
     }
 
     @PostMapping("/review/new")
-    public ReviewEntity addReview(@RequestBody ReviewDto reviewDto) throws Exception {
-        return reviewService.addReview(reviewDto);
+    public ResponseEntity addReview(@RequestBody ReviewDto reviewDto) throws Exception {
+        try {
+            ReviewEntity reviewEntity = reviewService.addReview(reviewDto);
+            return new ResponseEntity(reviewEntity, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PatchMapping("/review")
@@ -35,8 +44,12 @@ public class ReviewController {
     }
 
     @DeleteMapping("/review")
-    public void deleteReview(@RequestBody ReviewDto reviewDto) {
-        reviewService.deleteReview(reviewDto);
-
+    public ResponseEntity deleteReview(@RequestBody ReviewDto reviewDto) {
+        try {
+            PointEntity pointEntity = reviewService.deleteReview(reviewDto);
+            return new ResponseEntity<>(pointEntity, new HttpHeaders(HttpHeaders.EMPTY), HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), new HttpHeaders(HttpHeaders.EMPTY), HttpStatus.BAD_REQUEST);
+        }
     }
 }
