@@ -63,7 +63,7 @@ public class ReviewServiceImpl implements ReviewService {
         boolean havePhotos = reviewDto.getPhotoDtos() != null;
         //포인트 저장
         PointEntity pointEntity = pointRepository.findByUuid(reviewDto.getUserId());
-        int plusMile = reviewDto.getContent().length() > 0 ? +1 :+0;
+        int plusMile = reviewDto.getContent() != null ? +1 : +0;
         if (isSpecialFirst) {
             plusMile += havePhotos ? 2 : 1;
         } else {

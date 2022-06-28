@@ -36,7 +36,7 @@ create table review
     uuid        binary(16) primary key,
     user_id     binary(16)   not null,
     place_id    binary(16)   not null,
-    content     varchar(500) not null,
+    content     varchar(500) ,
     reword_score tinyint(1)  not null ,
     foreign key (user_id) references user (uuid),
     foreign key (place_id) references place (uuid)
