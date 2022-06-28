@@ -61,13 +61,13 @@ public class ReviewServiceImpl implements ReviewService {
         //특정장소에 첫리뷰인지확인 첫리뷰라면 보너스 1점
         boolean isSpecialFirst = reviewRepository.findAllByPlaceId(placeEntity.getUuid()).isEmpty() && placeEntity.isSpecialFlag();
         boolean havePhotos = reviewDto.getPhotoDtos() != null;
-        int plusMile;
         //포인트 저장
         PointEntity pointEntity = pointRepository.findByUuid(reviewDto.getUserId());
+        int plusMile = reviewDto.getContent() != null ? +1 : +0;
         if (isSpecialFirst) {
-            plusMile = havePhotos ? +3 : +2;
+            plusMile += havePhotos ? 2 : 1;
         } else {
-            plusMile = havePhotos ? +2 : +1;
+            plusMile += havePhotos ? 1 : 0;
         }
         pointRepository.save(PointEntity.builder()
                 .uuid(pointEntity.getUuid())
