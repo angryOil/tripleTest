@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +21,7 @@ public class PlaceServiceImpl implements PlaceService {
 
 
     @Override
-    public PlaceEntity create(PlaceDto placeDto) {
+    public PlaceEntity sava(PlaceDto placeDto) {
         return placeRepository.save(PlaceEntity
                 .builder()
                 .location(placeDto.getLocation())
@@ -28,6 +30,12 @@ public class PlaceServiceImpl implements PlaceService {
                 .build()
         );
     }
+
+    @Override
+    public Optional<PlaceEntity> findById(UUID uuid) {
+        return placeRepository.findById(uuid);
+    }
+
 
     @Override
     public List<PlaceEntity> getPlaces() {

@@ -2,21 +2,22 @@ package com.example.tripletest.review.service.impl;
 
 import com.example.tripletest.photo.dto.PhotoDto;
 import com.example.tripletest.photo.entity.PhotoEntity;
-import com.example.tripletest.photo.repository.PhotoRepository;
+import com.example.tripletest.photo.service.PhotoService;
 import com.example.tripletest.place.entity.PlaceEntity;
-import com.example.tripletest.place.repository.PlaceRepository;
+import com.example.tripletest.place.service.PlaceService;
 import com.example.tripletest.point.entity.PointEntity;
 import com.example.tripletest.point.entity.PointLogEntity;
-import com.example.tripletest.point.repository.PointLogRepository;
-import com.example.tripletest.point.repository.PointRepository;
+import com.example.tripletest.point.service.PointLogService;
+import com.example.tripletest.point.service.PointService;
 import com.example.tripletest.review.dto.ReviewDto;
 import com.example.tripletest.review.entity.ReviewEntity;
 import com.example.tripletest.review.repository.ReviewRepository;
 import com.example.tripletest.review.service.ReviewService;
 import com.example.tripletest.user.entity.UserEntity;
-import com.example.tripletest.user.repository.UserRepository;
+import com.example.tripletest.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
@@ -26,14 +27,16 @@ import java.util.stream.Collectors;
 
 
 @RequiredArgsConstructor
-public class ReviewServiceImpl implements ReviewService {
+@Service
+public class ReviewService2Impl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final UserRepository userRepository;
-    private final PlaceRepository placeRepository;
-    private final PointRepository pointRepository;
-    private final PointLogRepository pointLogRepository;
-    private final PhotoRepository photoRepository;
+    private final UserService userService;
+    private final PlaceService placeService;
+    private final PointService pointService;
+    private final PointLogService pointLogService;
+    private final PhotoService photoService;
+
 
     @Override
     public List<ReviewEntity> getReviews() {
@@ -44,28 +47,27 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional
     public ReviewEntity addReview(ReviewDto reviewDto) throws Exception {
+        System.out.println("리뷰 작성 impl2");
         // 유저 또는 장소가 존재하지않을경우
-        PlaceEntity placeEntity = placeRepository.findById(reviewDto.getPlaceId()).orElseThrow(() -> new BadCredentialsException("장소를 찾을수없습니다"));
-        UserEntity userEntity = userRepository.findById(reviewDto.getUserId()).orElseThrow(() -> new BadCredentialsException("유저를 찾을수없습니다"));
-
-        reviewRepository
-                .findByUserIdAndPlaceId(reviewDto.getUserId(), reviewDto.getPlaceId()).ifPresent(review -> {
-                    throw new IllegalStateException("이미 작성한 리뷰가 있습니다.");
-                });
+        PlaceEntity placeEntity = placeService.findById(reviewDto.getPlaceId()).orElseThrow(() -> new BadCredentialsException("장소를 찾을수없습니다"));
+        UserEntity userEntity = userService.searchByUserId(reviewDto.getUserId()).orElseThrow(() -> new BadCredentialsException("유저를 찾을수없습니다"));
+        reviewRepository.findByUserIdAndPlaceId(reviewDto.getUserId(), reviewDto.getPlaceId()).ifPresent(review -> {
+            throw new IllegalStateException("이미 작성한 리뷰가 있습니다.");
+        });
 
 
         //특정장소에 첫리뷰인지확인 첫리뷰라면 보너스 1점
         boolean isSpecialFirst = reviewRepository.findAllByPlaceId(placeEntity.getUuid()).isEmpty() && placeEntity.isSpecialFlag();
-        boolean havePhotos = reviewDto.getPhotoDtos() != null;
+        boolean havePhotos = (reviewDto.getPhotoDtos() != null && reviewDto.getPhotoDtos().size() != 0);
         //포인트 저장
-        PointEntity pointEntity = pointRepository.findByUuid(reviewDto.getUserId());
+        PointEntity pointEntity = pointService.searchByUuid(reviewDto.getUserId());
         int plusMile = reviewDto.getContent() != null ? +1 : +0;
         if (isSpecialFirst) {
             plusMile += havePhotos ? 2 : 1;
         } else {
             plusMile += havePhotos ? 1 : 0;
         }
-        pointRepository.save(PointEntity.builder()
+        pointService.save(PointEntity.builder()
                 .uuid(pointEntity.getUuid())
                 .mileage(pointEntity.getMileage() + plusMile)
                 .userId(pointEntity.getUserId())
@@ -83,34 +85,24 @@ public class ReviewServiceImpl implements ReviewService {
 
         //포토있을경우 포토 저장
         if (havePhotos) {
-            reviewDto
-                    .getPhotoDtos()
-                    .forEach(photoDto -> {
-                        photoRepository.save(
-                                PhotoEntity.builder()
-                                        .reviewEntity(reviewEntity)
-                                        .name(photoDto.getPhotoName())
-                                        .build());
-                    });
-        }
-        //포인트 로그
-        pointLogRepository.save(PointLogEntity.builder()
-                .pointId(pointEntity.getUuid())
-                .reviewId(reviewEntity.getUuid())
-                .placeId(reviewDto.getPlaceId())
-                .action("ADD")
-                .pointApply(plusMile)
-                .build());
-
-        //작성된리뷰의 엔티티를  리턴
+            photoService.saveAllByEntity(reviewEntity, reviewDto.getPhotoDtos());
+            //포인트 로그
+            pointLogService.save(PointLogEntity.builder()
+                    .pointId(pointEntity.getUuid())
+                    .reviewId(reviewEntity.getUuid())
+                    .placeId(reviewDto.getPlaceId())
+                    .action("ADD")
+                    .pointApply(plusMile)
+                    .build());
+        }  //작성된리뷰의 엔티티를  리턴
         return reviewEntity;
-
     }
 
+
     @Override
-    public ReviewDto getReview(UUID uuid) {
-        ReviewEntity reviewEntity = reviewRepository.findById(uuid).get();
-        List<PhotoDto> photoDtos = photoRepository.findAllByReviewEntity(reviewEntity).stream().map(entity -> PhotoDto.builder()
+    public ReviewDto getReview(UUID uuid) throws Exception {
+        ReviewEntity reviewEntity = reviewRepository.findById(uuid).orElseThrow(() -> new Exception("해당 아이디 리뷰가 없습니다"));
+        List<PhotoDto> photoDtos = photoService.findAllByReviewEntity(reviewEntity).stream().map(entity -> PhotoDto.builder()
                         .photoID(entity.getUuid())
                         .photoName(entity.getName())
                         .build())
@@ -131,9 +123,9 @@ public class ReviewServiceImpl implements ReviewService {
         //이전 리뷰와 비교 후 점수 증감
 
         ReviewEntity originReview = reviewRepository.findByUserIdAndPlaceId(reviewDto.getUserId(), reviewDto.getPlaceId()).get();
-        List<PhotoEntity> originPhotos = photoRepository.findAllByReviewEntity(originReview);
+        List<PhotoEntity> originPhotos = photoService.findAllByReviewEntity(originReview);
 
-        PointEntity pointEntity = pointRepository.findByUuid(originReview.getUserId());
+        PointEntity pointEntity = pointService.searchByUuid(originReview.getUserId());
         List<PhotoDto> updatePhotos = reviewDto.getPhotoDtos();
         //증감할 점수
         int changeMile = 0;
@@ -154,13 +146,13 @@ public class ReviewServiceImpl implements ReviewService {
 
         //포인트 로그 포인트는 실제 점수가 변경될경우에만 수정
         if (changeMile != 0) {
-            pointRepository.save(
+            pointService.save(
                     PointEntity.builder()
                             .uuid(pointEntity.getUuid())
                             .userId(pointEntity.getUserId())
                             .mileage(pointEntity.getMileage() + changeMile)
                             .build());
-            pointLogRepository.save(PointLogEntity.builder()
+            pointLogService.save(PointLogEntity.builder()
                     .action("MOD")
                     .reviewId(originReview.getUuid())
                     .placeId(originReview.getPlaceId())
@@ -170,14 +162,14 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         //사진 삭제후 다시 업로드
-        if (photoRepository.findAllByReviewEntity(originReview).size() > 0) {
-            photoRepository.deleteAllByReviewEntity(originReview);
+        if (photoService.findAllByReviewEntity(originReview).size() > 0) {
+            photoService.deleteAll(originReview);
             List<PhotoEntity> photoEntities = updatePhotos != null ? updatePhotos.stream().map(dto -> PhotoEntity.builder()
                     .reviewEntity(originReview)
                     .name(dto.getPhotoName())
                     .build()).collect(Collectors.toList()) : null;
             if (photoEntities != null) {
-                photoRepository.saveAll(photoEntities);
+                photoService.saveAllByEntity(photoEntities);
             }
         } else {
             if (updatePhotos != null) {
@@ -185,7 +177,7 @@ public class ReviewServiceImpl implements ReviewService {
                         .reviewEntity(originReview)
                         .name(dto.getPhotoName())
                         .build()).collect(Collectors.toList());
-                photoRepository.saveAll(photoEntities);
+                photoService.saveAllByEntity(photoEntities);
             }
         }
 
@@ -206,16 +198,16 @@ public class ReviewServiceImpl implements ReviewService {
     public PointEntity deleteReview(ReviewDto reviewDto) throws Exception {
 
         ReviewEntity reviewEntity = reviewRepository.findById(reviewDto.getUuid()).orElseThrow(() -> new RuntimeException("없는 리뷰입니다"));
-        UserEntity userEntity = userRepository.findById(reviewEntity.getUserId()).orElseThrow(() -> new RuntimeException("없는 사용자입니다"));
-        PointEntity pointEntity = pointRepository.findByUuid(userEntity.getUuid());
+        UserEntity userEntity = userService.searchByUserId(reviewEntity.getUserId()).orElseThrow(() -> new RuntimeException("없는 사용자입니다"));
+        PointEntity pointEntity = pointService.searchByUuid(userEntity.getUuid());
         //점수 회수
-        PointEntity point = pointRepository.save(PointEntity.builder()
+        PointEntity point = pointService.save(PointEntity.builder()
                 .uuid(pointEntity.getUuid())
                 .userId(pointEntity.getUserId())
                 .mileage(pointEntity.getMileage() - reviewEntity.getRewordScore())
                 .build());
         //사진 삭제
-        photoRepository.deleteAllByReviewEntity(reviewEntity);
+        photoService.deleteAll(reviewEntity);
 
         //리뷰삭제
         reviewRepository.deleteById(reviewEntity.getUuid());

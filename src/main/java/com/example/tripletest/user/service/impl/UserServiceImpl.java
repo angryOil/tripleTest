@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,8 +23,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserEntity register(UserDto userDto) {
-        if (userRepository.findById(userDto.getId()) != null) {
-            return null;
+        if (userRepository.findById(userDto.getId()).isPresent()) {
+            return new UserEntity();
         }
         UserEntity userEntity = userRepository.save(
                 UserEntity.builder()
@@ -43,13 +45,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto login(UserDto userDto) {
-        UserEntity findUser = userRepository.findById(userDto.getId());
+    public UserDto login(UserDto userDto) throws Exception {
+        UserEntity findUser = userRepository.findById(userDto.getId()).orElseThrow(()-> new Exception("로그인 실패"));
         return findUser.getPw().equals(userDto.getPw()) ? userDto : null;
     }
 
     @Override
-    public UserEntity searchByUserId(String userId) {
+    public Optional<UserEntity> searchByUserId(UUID userId) {
         return userRepository.findById(userId);
     }
 

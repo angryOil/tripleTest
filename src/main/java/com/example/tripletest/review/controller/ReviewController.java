@@ -24,8 +24,13 @@ public class ReviewController {
     }
 
     @GetMapping("/review/{id}")
-    public ReviewDto getReview(@PathVariable("id") UUID id) {
-        return reviewService.getReview(id);
+    public ResponseEntity getReview(@PathVariable("id") UUID id) throws Exception {
+        try {
+            return new ResponseEntity(reviewService.getReview(id), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/review/new")

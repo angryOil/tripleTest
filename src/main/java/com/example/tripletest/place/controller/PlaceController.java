@@ -19,7 +19,7 @@ public class PlaceController {
 
     @PostMapping("/place/new")
     public PlaceEntity newPlace(@RequestBody PlaceDto placeDto) {
-        return placeService.create(placeDto);
+        return placeService.sava(placeDto);
     }
 
     @GetMapping("/places")

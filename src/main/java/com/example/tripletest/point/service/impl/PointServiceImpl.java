@@ -24,8 +24,13 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public PointEntity searchByUserId(String userId) {
-        UserEntity userEntity = userRepository.findById(userId);
+        UserEntity userEntity = userRepository.findById(userId).get();
         return pointRepository.findByUuid(userEntity.getUuid());
+    }
+
+    @Override
+    public PointEntity save(PointEntity point) {
+        return pointRepository.save(point);
     }
 
 

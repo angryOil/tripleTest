@@ -16,7 +16,7 @@ public interface ReviewService {
     ReviewDto modifyReview(ReviewDto reviewDto) throws Exception;
     ReviewEntity addReview(ReviewDto reviewDto) throws Exception;
 
-    ReviewDto getReview(UUID uuid);
+    ReviewDto getReview(UUID uuid) throws Exception;
 
     PointEntity deleteReview(ReviewDto reviewDto) throws Exception;
 }

@@ -8,4 +8,6 @@ import java.util.UUID;
 public interface PointService {
     PointEntity searchByUuid(UUID uuid);
     PointEntity searchByUserId(String userId);
+
+    PointEntity save(PointEntity point);
 }
