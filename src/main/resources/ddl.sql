@@ -59,5 +59,5 @@ create table point_log
     place_id    binary(16) not null,
     action      varchar(10) not null,
     review_kind varchar(20) not null ,
-    point_change tinyint(1) not null,
+    point_change tinyint(1) not null
 );

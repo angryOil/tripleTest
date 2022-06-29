@@ -134,6 +134,8 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     public ReviewDto modifyReview(ReviewDto reviewDto) throws Exception {
         //이전 리뷰와 비교 후 점수 증감
+        System.out.println("reviewMod");
+
         ReviewEntity originReview = reviewRepository.findByUserIdAndPlaceId(reviewDto.getUserId(), reviewDto.getPlaceId()).get();
         List<PhotoEntity> originPhotos = photoRepository.findAllByReviewEntity(originReview);
 
@@ -143,10 +145,16 @@ public class ReviewServiceImpl implements ReviewService {
         int changeMile;
         String reviewKind = "";
         if (originPhotos.size() == 0) { //전리뷰에 사진이없었을경우 업데이트리뷰에 사진있으면 1점 없으면 0점추가
-            changeMile = reviewDto.getPhotoDtos() != null ? 0 : 1;
-            reviewKind += "add  photo";
+            if (reviewDto.getPhotoDtos().isEmpty()) {
+                reviewKind += "mod content";
+                changeMile = 0;
+            } else {
+                reviewKind += "add  photo";
+                changeMile = 1 ;
+            }
+
         } else { //전리뷰는 사진이있었지만 업로드 리뷰에 사진이없다면 -1 있다면 0점
-            changeMile = reviewDto.getPhotoDtos() == null ? -1 : 0;
+            changeMile = reviewDto.getPhotoDtos().isEmpty() ? -1 : 0;
 
         }
 
@@ -178,7 +186,16 @@ public class ReviewServiceImpl implements ReviewService {
             if (photoEntities != null) {
                 photoRepository.saveAll(photoEntities);
             }
+        } else {
+            if (!updatePhotos.isEmpty()) {
+                List<PhotoEntity> photoEntities = updatePhotos != null ? updatePhotos.stream().map(dto -> PhotoEntity.builder()
+                        .reviewEntity(originReview)
+                        .name(dto.getPhotoName())
+                        .build()).collect(Collectors.toList()) : null;
+                photoRepository.saveAll(photoEntities);
+            }
         }
+
         // 해당리뷰로 바뀐점수 적용 , 리뷰 수정
         reviewRepository.save(ReviewEntity.builder()
                 .rewordScore(originReview.getRewordScore() + changeMile)
