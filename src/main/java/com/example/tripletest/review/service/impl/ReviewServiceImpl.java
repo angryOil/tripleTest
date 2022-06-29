@@ -55,6 +55,7 @@ public class ReviewServiceImpl implements ReviewService {
                     throw new IllegalStateException("이미 작성한 리뷰가 있습니다.");
                 });
 
+
         //특정장소에 첫리뷰인지확인 첫리뷰라면 보너스 1점
         boolean isSpecialFirst = reviewRepository.findAllByPlaceId(placeEntity.getUuid()).isEmpty() && placeEntity.isSpecialFlag();
         boolean havePhotos = reviewDto.getPhotoDtos() != null;
@@ -94,15 +95,12 @@ public class ReviewServiceImpl implements ReviewService {
                                         .build());
                     });
         }
-        String reviewKind = isSpecialFirst ? "special" : "";
-        reviewKind += havePhotos ? " photo " : "";
         //포인트 로그
         pointLogRepository.save(PointLogEntity.builder()
                 .pointId(pointEntity.getUuid())
                 .reviewId(reviewEntity.getUuid())
                 .placeId(reviewDto.getPlaceId())
                 .action("ADD")
-                .reviewKind(reviewKind)
                 .pointApply(plusMile)
                 .build());
 
@@ -134,7 +132,6 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     public ReviewDto modifyReview(ReviewDto reviewDto) throws Exception {
         //이전 리뷰와 비교 후 점수 증감
-        System.out.println("reviewMod");
 
         ReviewEntity originReview = reviewRepository.findByUserIdAndPlaceId(reviewDto.getUserId(), reviewDto.getPlaceId()).get();
         List<PhotoEntity> originPhotos = photoRepository.findAllByReviewEntity(originReview);
@@ -142,21 +139,21 @@ public class ReviewServiceImpl implements ReviewService {
         PointEntity pointEntity = pointRepository.findByUuid(originReview.getUserId());
         List<PhotoDto> updatePhotos = reviewDto.getPhotoDtos();
         //증감할 점수
-        int changeMile;
-        String reviewKind = "";
-        if (originPhotos.size() == 0) { //전리뷰에 사진이없었을경우 업데이트리뷰에 사진있으면 1점 없으면 0점추가
-            if (reviewDto.getPhotoDtos().isEmpty()) {
-                reviewKind += "mod content";
-                changeMile = 0;
-            } else {
-                reviewKind += "add  photo";
-                changeMile = 1 ;
-            }
+        int changeMile = 0;
 
-        } else { //전리뷰는 사진이있었지만 업로드 리뷰에 사진이없다면 -1 있다면 0점
-            changeMile = reviewDto.getPhotoDtos().isEmpty() ? -1 : 0;
-
+        // 글 관련
+        if (originReview.getContent() == null || originReview.getContent().length() == 0) {  //이전 리뷰에 글이없었는데 이번에 있다면 +1 아직도없다면 0
+            changeMile += (reviewDto.getContent() == null || reviewDto.getContent().length() == 0) ? 0 : 1;
+        } else {   //이전에 글이있는데 지금은 삭제했다면 -1 지금도 있으면 0
+            changeMile += (reviewDto.getContent() == null || reviewDto.getContent().length() == 0) ? -1 : 0;
         }
+
+        if (originPhotos == null || originPhotos.size() == 0) { // 이전 리뷰 사진이없었다면  이번에 있으면 +1 없으면 0
+            changeMile += (reviewDto.getPhotoDtos() == null || reviewDto.getPhotoDtos().size() == 0) ? 0 : 1;
+        } else {  //이전 리뷰에 사진있있었는데 지금은 지웠다면 -1 지금도 사진이 있다면 0
+            changeMile += (reviewDto.getPhotoDtos() == null || reviewDto.getPhotoDtos().size() == 0) ? -1 : 0;
+        }
+
 
         //포인트 로그 포인트는 실제 점수가 변경될경우에만 수정
         if (changeMile != 0) {
@@ -168,7 +165,6 @@ public class ReviewServiceImpl implements ReviewService {
                             .build());
             pointLogRepository.save(PointLogEntity.builder()
                     .action("MOD")
-                    .reviewKind(reviewKind)
                     .reviewId(originReview.getUuid())
                     .placeId(originReview.getPlaceId())
                     .pointId(pointEntity.getUuid())
@@ -187,11 +183,11 @@ public class ReviewServiceImpl implements ReviewService {
                 photoRepository.saveAll(photoEntities);
             }
         } else {
-            if (!updatePhotos.isEmpty()) {
-                List<PhotoEntity> photoEntities = updatePhotos != null ? updatePhotos.stream().map(dto -> PhotoEntity.builder()
+            if (updatePhotos != null) {
+                List<PhotoEntity> photoEntities = updatePhotos.stream().map(dto -> PhotoEntity.builder()
                         .reviewEntity(originReview)
                         .name(dto.getPhotoName())
-                        .build()).collect(Collectors.toList()) : null;
+                        .build()).collect(Collectors.toList());
                 photoRepository.saveAll(photoEntities);
             }
         }
