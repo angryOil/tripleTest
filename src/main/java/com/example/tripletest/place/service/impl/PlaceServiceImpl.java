@@ -21,14 +21,18 @@ public class PlaceServiceImpl implements PlaceService {
 
 
     @Override
-    public PlaceEntity sava(PlaceDto placeDto) {
-        return placeRepository.save(PlaceEntity
-                .builder()
-                .location(placeDto.getLocation())
-                .name(placeDto.getName())
-                .specialFlag(placeDto.isSpecialFlag())
-                .build()
-        );
+    public PlaceEntity save(PlaceDto placeDto) throws Exception {
+        try {
+            return placeRepository.save(PlaceEntity
+                    .builder()
+                    .location(placeDto.getLocation())
+                    .name(placeDto.getName())
+                    .specialFlag(placeDto.isSpecialFlag())
+                    .build()
+            );
+        } catch (Exception e) {
+            throw new Exception("이미 존재하는 장소입니다.");
+        }
     }
 
     @Override

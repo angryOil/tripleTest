@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface PlaceService {
 
-    PlaceEntity sava(PlaceDto placeDto);
+    PlaceEntity save(PlaceDto placeDto) throws Exception;
 
     Optional<PlaceEntity> findById(UUID uuid);
     List<PlaceEntity> getPlaces();

@@ -1,5 +1,7 @@
 package com.example.tripletest.point.entity;
 
+import com.example.tripletest.customEnum.Action;
+import com.example.tripletest.customEnum.Type;
 import lombok.*;
 
 import javax.persistence.Entity;
@@ -23,7 +25,7 @@ public class PointLogEntity {
     private UUID reviewId;
     private UUID placeId;
     private String action;
-    private int pointChange;
+    private String type;
     private int pointApply;
 
 }
