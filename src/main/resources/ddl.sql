@@ -58,6 +58,14 @@ create table point_log
     point_apply tinyint(1) not null ,
     review_id   binary(16) not null,
     place_id    binary(16) not null,
-    action      varchar(10) not null,
-    point_change tinyint(1) not null
+    type         varchar(10) not null ,
+    action      varchar(10) not null
 );
+
+create table event(
+    uuid  binary(16) primary key,
+    review_id binary(16) not null ,
+    user_id binary(16) not null ,
+    place_id binary(16) not null
+
+    )

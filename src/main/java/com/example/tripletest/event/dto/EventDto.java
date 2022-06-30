@@ -1,4 +1,4 @@
-package com.example.tripletest.review.dto;
+package com.example.tripletest.event.dto;
 
 import com.example.tripletest.photo.dto.PhotoDto;
 import lombok.*;
@@ -11,8 +11,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ReviewDto {
-    private UUID uuid;
+public class EventDto {
+    private UUID reviewId;
     private UUID userId;
     private UUID placeId;
     private boolean deleteFlag;
