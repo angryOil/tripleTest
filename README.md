@@ -1,8 +1,9 @@
 # tripleTest
 
 ## 실행방법
->> src/main/resource에있는 ddl.sql 파일을 mysql로 실행 시킵니다. 사용할 db 이름은 (triple_test)입니다. <br/>
+>> src/main/resource경로에있는 ddl.sql 파일을 mysql로 실행 시킵니다. 사용할 db 이름은 (triple_test)입니다. <br/>
 >> 그후스프링app을 실행시킵니다.<br/>
+>> src/main/resource경로에 있는 application.properties에 mysql 부분을 설정해줍니다. <br/>
 >> postman등 API요청 프로그램 으로 localhost:8080/ 이후 아래에있는 내용들을 사용하면됩니다.
 <hr/>
 USER
