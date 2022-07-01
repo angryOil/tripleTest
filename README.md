@@ -8,10 +8,9 @@
 USER
 post	/user/new  (회원가입)
 
-	요청
-  {
-  "id":"name",
-	"pw":"pw"
+	요청{
+		"id":"name",
+		"pw":"pw"
 	}
 
 	응답{
@@ -32,12 +31,10 @@ get /users  (유저 리스트확인)
     	}
     ]
 
-get /point/{userId}  (특정 유저  포인트 확인하기)
+get /point/{userId}{가입할떄작성한 }  (특정 유저  포인트 확인하기)
 
-	요청 (회원가입때 사용한 id)
-  {
-    112
-  }
+	요청 (회원가입때 사용한 id){
+    112}
   
 	응답 
 	{
@@ -137,7 +134,7 @@ get /events (모든 이벤트 보여주기)
 		]
 
 
-get /events/{reviewId}
+get /events/{reviewId} {리뷰의 uuid}
 
 	응답
 		{
