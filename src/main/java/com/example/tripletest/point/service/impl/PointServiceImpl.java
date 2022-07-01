@@ -23,8 +23,8 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public PointEntity searchByUserId(String userId) {
-        UserEntity userEntity = userRepository.findById(userId).get();
+    public PointEntity searchByUserId(String userId) throws Exception {
+        UserEntity userEntity = userRepository.findById(userId).orElseThrow(()->new Exception("존재하지않는 회원입니다"));
         return pointRepository.findByUuid(userEntity.getUuid());
     }
 

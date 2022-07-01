@@ -1,3 +1,4 @@
+drop database if exists  triple_test;
 create database triple_test;
 
 
@@ -7,8 +8,7 @@ create table user
 (
     uuid              binary(16) primary key,
     id                varchar(25) unique,
-    pw                varchar(25)           not null,
-    first_review_flag boolean default false not null
+    pw                varchar(25)           not null
 );
 
 
@@ -62,10 +62,4 @@ create table point_log
     action      varchar(10) not null
 );
 
-create table event(
-    uuid  binary(16) primary key,
-    review_id binary(16) not null ,
-    user_id binary(16) not null ,
-    place_id binary(16) not null
 
-    )

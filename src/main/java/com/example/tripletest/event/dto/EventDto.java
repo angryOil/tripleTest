@@ -15,7 +15,6 @@ public class EventDto {
     private UUID reviewId;
     private UUID userId;
     private UUID placeId;
-    private boolean deleteFlag;
     private String content;
     private List<PhotoDto> photoDtos;
 

@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserEntity register(UserDto userDto) {
         if (userRepository.findById(userDto.getId()).isPresent()) {
-            return new UserEntity();
+            throw new IllegalStateException("이미존재하는 회원입니다");
         }
         UserEntity userEntity = userRepository.save(
                 UserEntity.builder()

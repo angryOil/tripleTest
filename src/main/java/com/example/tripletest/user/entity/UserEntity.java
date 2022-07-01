@@ -20,7 +20,6 @@ public class UserEntity {
     @Column(unique = true)
     private String id;
     private String pw;
-    private boolean firstReviewFlag;
 
     @Builder
     public UserEntity(String id  , String pw) {

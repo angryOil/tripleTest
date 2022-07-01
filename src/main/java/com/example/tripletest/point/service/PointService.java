@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface PointService {
     PointEntity searchByUuid(UUID uuid);
-    PointEntity searchByUserId(String userId);
+    PointEntity searchByUserId(String userId) throws Exception;
 
     PointEntity save(PointEntity point);
 }
